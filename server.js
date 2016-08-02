@@ -5,12 +5,14 @@ var mime = require('mime');
 var cache ={};
 
 function send404(response){
+	console.log("send404");
 response.writeHead(404, {'Content-Type': 'text/plain'});
 response.write('Błąd 404 - plik nie został znaleziony');
 response.end();
 }
 
 function sendFile(response, filePath, fileContents){
+	console.log("sendFile");
 	response.writeHead(
 		200,
 		{"content-type": mime.lookup(path.basename(filePath))}
@@ -19,6 +21,7 @@ function sendFile(response, filePath, fileContents){
 }
 
 function serveStatic( response, cache, absPath){
+	console.log("serveStatic");
 	if(cache[absPath]){
 		sendFile(response,absPath,cache[absPath]);
 } else {
@@ -41,6 +44,7 @@ function serveStatic( response, cache, absPath){
 
 var server = http.createServer(function(request,response){
 	var filePath=false;
+	console.log("createServer");
 	if(request.url== '/') {
 		filePath= 'public/index.html';
 	} else {
@@ -49,28 +53,11 @@ var server = http.createServer(function(request,response){
 	}
 });
 
-server.listen(3000, function(){
-	console.log("Server jest na porcie 3000.");
+server.listen(8080, function(){
+	console.log("Server jest na porcie 8080.");
 });
 
 var chatServer = require('./lib/chat_server');
+console.log("chatServer");
 chatServer.listen(server);
 
-exports.listen= function(server){
-	io=socketio.listen(server);
-	io.set('log lever',1);
-
-	io.sockets.on('connection', function(socket){
-		guestNumber = assignGuestName(socket.guestNumber,nickNames, namesUsed);
-		joinRoom(socket, 'Lobby');
-
-		handleMessageBroadcasting(socket, nickNames);
-		handleNameChangeAttempts(socket,nickNames,namesUsed);
-		handleRoomJoining(socket);
-
-		socket.on('rooms',function(){
-			socket.emit('rooms', io.sockets.manager.rooms);
-		});
-		handleClientDisconnection(socket, nickNames,namesUsed)
-	});
-}
