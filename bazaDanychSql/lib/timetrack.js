@@ -69,10 +69,7 @@ exports.show = function(db,res,showArchived){
 	var query = "SELECT * FROM work WHERE archived=? ORDER BY date DESC";
 	
 	var archivedValue = (showArchived) ? 1: 0;
-	db.query(
-		query,
-		[archivedValue],
-		function(err,rows){
+	db.query( query, [archivedValue], function(err,rows){
 			if(err) throw err;
 			html = (showArchived)
 			? ''
